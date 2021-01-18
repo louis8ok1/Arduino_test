@@ -10,7 +10,7 @@ void loop(){
   while(Serial.available()>0)
   {
     int data=Serial.read()-'0';//將ASCII轉換成整數
-    Serial.print("input number is :");
+    Serial.print("input number is : ");
 
     Serial.println(data);
 

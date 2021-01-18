@@ -2,5 +2,5 @@
     "port": "COM5",
     "board": "arduino:avr:mega",
     "configuration": "cpu=atmega2560",
-    "sketch": "USB_test/usb_test.ino"
+    "sketch": "watch_dog_收尾\\watch_dog.ino"
 }
