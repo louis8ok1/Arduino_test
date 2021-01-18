@@ -17,6 +17,8 @@ int count1 = 0;
 
 int bounceDelay = 5; // 設定連續 5 毫秒狀態相同時，判定為穩定
 
+
+
 boolean debounce(int PIN)
 {
   boolean state;
@@ -46,55 +48,7 @@ int cpu_check(){
 
 }
 
-int eeprom_check(int addr){
-  
-  int num[4] = {255,0,170,85};
-  
-  for(int i=0;i<4;i++){
-      Serial.print("EEPROM position:");
-      Serial.print(addr);
-      Serial.print(" write: ");
-      Serial.print(num[i]);
-      EEPROM.write(addr,num[i]);
 
-      Serial.print(" | ");
-
-      val = EEPROM.read(addr);
-      Serial.print("EEPROM position:");
-      Serial.print(addr);
-      Serial.print(" contains ");
-      Serial.println(val);
-      
-      if(num[i]!= val){
-        return 0;
-        
-      }
-
-  }
-  return 1;
-}
-
-int memory_check(){
-  int addr = 0;
-  int check;
-  while(addr!=EEsize){
-    check = eeprom_check(addr);
-    if(check==0){
-      Serial.print("EEPROM");
-      Serial.print(" position:");
-      Serial.print(addr);
-      Serial.print("is broken");
-      return 0;
-      break;
-    }
-    
-    addr+=1;
-  }
-  if(addr==(EEsize)){
-     Serial.println("EEPROM Finish check.");
-  }
-  return 1;
-}
 
 /////FLASH CHECK
 int Flag = 0;
@@ -148,24 +102,25 @@ void setup()
   Serial.begin(115200);
   
   Serial.println("Start");
+  Serial.println(EEPROM.read(0));
   
-  Serial.println("USB Port is fine.");
-  /*if(memory_check()==0){
-    Serial.println("MEMORY is broken.");
-    while(1){}
-  }*/
-   crc_check();
-  if(Flag==0){
-    Serial.println("Flash is broken");
+  if(EEPROM.read(0)==0){
+    Serial.println("TEST");
+    crc_check();
+    if(Flag==0){
+      Serial.println("Flash is broken");
     while(1){}
   }
-  if(cpu_check()==0){
-    Serial.println("CPU is broken.");
+    if(cpu_check()==0){
+      Serial.println("CPU is broken.");
     while(1){}
+    }
   }
-
+  
   Serial.println("Finish BIST");
   Serial.println("Start App");
+  
+  
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);  
   pinMode(LED3, OUTPUT); 
@@ -184,7 +139,10 @@ void setup()
 
 
 void loop()
-{     //APP
+{     
+    
+    if(EEPROM.read(0)==0){
+        //APP 
       digitalWrite(LED1, HIGH);
       digitalWrite(LED2, LOW);
       delay(500);
@@ -193,6 +151,8 @@ void loop()
       delay(500);
       //解決button彈跳問題!
       if(debounce(BUTTON_PIN) ==true){
+        
+        EEPROM.write(0,1);
         while(1){
         
           digitalWrite(LED2, LOW);
@@ -200,6 +160,15 @@ void loop()
         }
      
       }  
+    }  
+    else
+    {
+     digitalWrite(LED3, HIGH);
+      delay(500);
+      digitalWrite(LED3, LOW);
+       delay(500);
+    }
+    
       wdt_reset();
     
     
